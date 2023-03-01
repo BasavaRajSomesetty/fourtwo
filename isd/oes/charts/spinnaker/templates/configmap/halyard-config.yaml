@@ -81,11 +81,6 @@ data:
     $HAL_COMMAND config deploy ha clouddriver enable
     $HAL_COMMAND config deploy ha echo enable
 
-    
-    
-
-
-
     # Enable Authentication by default
     $HAL_COMMAND config security authn ldap edit --url ldap://isd-openldap:389 --user-dn-pattern  'cn={0},dc=example,dc=org'
     $HAL_COMMAND config security authn ldap enable
