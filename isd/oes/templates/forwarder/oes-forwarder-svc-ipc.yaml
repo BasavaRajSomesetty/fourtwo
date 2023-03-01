@@ -9,7 +9,7 @@ metadata:
     agent.opsmx.com/role: controller
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
 spec:
   selector:
     app: opsmx-controller-controller1

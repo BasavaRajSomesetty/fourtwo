@@ -10,7 +10,7 @@ metadata:
     component: ui
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
   name: oes-ui
 spec:
   replicas: 1
@@ -28,10 +28,10 @@ spec:
         component: ui
         heritage: "Helm"
         release: "isd"
-        chart: "oes-4.0.9"
+        chart: "oes-4.0.8"
     spec:
       containers:
-      - image: quay.io/opsmxpublic/ubi8-oes-ui:v4.0.3
+      - image: quay.io/opsmxpublic/ubi8-oes-ui:v4.0.2
         name: oes-ui
         ports:
         - containerPort: 8080

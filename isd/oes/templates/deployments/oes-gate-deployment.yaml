@@ -10,7 +10,7 @@ metadata:
     component: gate
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
   name: oes-gate
 spec:
   replicas: 1
@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/secret: 1403a063282d8cba3ba8f403d7384841cd162510b2dbbdef99b4579c60b8315b
+        checksum/secret: 4b4175de7c1a2d31982a058d8943ba7695b314b450a658b9ad247bd092e71362
         moniker.spinnaker.io/application: isd
         prometheus.io/scrape: "false"
         prometheus_io_path: /mgmt/prometheus
@@ -31,10 +31,10 @@ spec:
         component: gate
         heritage: "Helm"
         release: "isd"
-        chart: "oes-4.0.9"
+        chart: "oes-4.0.8"
     spec:
       containers:
-      - image: quay.io/opsmxpublic/ubi8-gate:v4.0.3
+      - image: quay.io/opsmxpublic/ubi8-gate:v4.0.2
         name: oes-gate
         env:
         - name: spring_profiles_active

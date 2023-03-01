@@ -11,7 +11,7 @@ metadata:
   labels:
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
 data:
   github-create.sh: |-
         #!/bin/sh
@@ -40,11 +40,11 @@ data:
                 if [ "$gitusername" == "$org" ]
                 then
                      curl -H "Authorization: token $gitpassword" --data "$object" https://api.github.com/user/repos
-                     git clone https://github.com/OpsMx/standard-gitops-repo.git -b v4.0.3
+                     git clone https://github.com/OpsMx/standard-gitops-repo.git -b v4.0
                      git clone https://$gitusername:$gitpassword@github.com/$gitusername/$repo_name.git
                 else
                      curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $gitpassword" https://api.github.com/orgs/$org/repos -d '{"name":"'$repo_name'"}'
-                     git clone https://github.com/OpsMx/standard-gitops-repo.git -b v4.0.3
+                     git clone https://github.com/OpsMx/standard-gitops-repo.git -b v4.0
                      git clone https://$gitusername:$gitpassword@github.com/$org/$repo_name.git
                 fi
 
