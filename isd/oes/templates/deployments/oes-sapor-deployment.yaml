@@ -10,7 +10,7 @@ metadata:
     component: sapor
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.8"
+    chart: "oes-4.0.9"
   name: oes-sapor
 spec:
   replicas: 1
@@ -32,14 +32,14 @@ spec:
         component: sapor
         heritage: "Helm"
         release: "isd"
-        chart: "oes-4.0.8"
+        chart: "oes-4.0.9"
     spec:
       initContainers:
       - name: db-check
         image: quay.io/opsmxpublic/postgres:9.6.5
         command: ['/bin/bash', '-c', "sleep 30;echo Waiting for oes-db to be up and running; pg_isready -h oes-db -p 5432 && echo PostgreSQL DB is ready to receive connections"]
       containers:
-      - image: quay.io/opsmxpublic/ubi8-oes-sapor:v4.0.2.1
+      - image: quay.io/opsmxpublic/ubi8-oes-sapor:v4.0.3
         name: oes-sapor
         env:
         ports:
