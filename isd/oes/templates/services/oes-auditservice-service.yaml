@@ -8,7 +8,7 @@ metadata:
     component: auditservice
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
   name: oes-audit-service
 spec:
   ports:

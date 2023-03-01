@@ -9,7 +9,7 @@ metadata:
     app: opa
     heritage: "Helm"
     release: "isd"
-    chart: "oes-4.0.9"
+    chart: "oes-4.0.8"
   name: opa
 spec:
   replicas: 1
@@ -24,7 +24,7 @@ spec:
         app: opa
         heritage: "Helm"
         release: "isd"
-        chart: "oes-4.0.9"
+        chart: "oes-4.0.8"
       name: opa
     spec:
       containers:
