@@ -26,8 +26,6 @@ data:
        echo "To expedite the restart, wait for 60 seconds and delete the spinnaker-halyard-0 pod from another window"
        exit 4
     fi
-
-
     cp -r /tmp/spinnaker/test// /tmp/spinnaker/.hal
     if [ -d "/tmp/spinnaker/test/pipeline-promotion/" ]
     then
@@ -36,6 +34,38 @@ data:
     if [ -d "/tmp/spinnaker/test/clusterconfig/" ]
     then
        cp -r /tmp/spinnaker/test/clusterconfig /tmp/spinnaker/clusterconfig
+    fi
+    ## If BOM file present in gitops repo consider bom file and replace images in the service-setting folder to the respective services
+    if [ -r "/tmp/spinnaker/test/bom" ]
+    then
+      cp -r /tmp/spinnaker/test/bom /tmp/spinnaker/bom
+      rm -rf /tmp/spinnaker/.hal/bom
+      ## Updated the halyard config version
+      crthalversion=$(yq e '.deploymentConfigurations.[].version' /tmp/spinnaker/.hal/config)
+      halversion=$(yq e '.version' /tmp/spinnaker/bom)
+      echo "INFO: Updating the halyard version from VERSION $crthalversion to VERSION $halversion"
+      yq -i e '.deploymentConfigurations.[].version = "'$halversion'"' /tmp/spinnaker/.hal/config
+      ## Read service  as asingle line comma saperated
+      echo "INFO: Updating the spinnaker images of service-settings folder using bom file in gitops"
+      halservices=$(yq e '(.services | keys)[]' /tmp/spinnaker/bom | xargs | sed -e 's/ /,/g')
+      IFS=","
+      for i in $halservices
+      do
+        svcimg=$(yq e '.services.'$i'.image' /tmp/spinnaker/bom)
+        svcn=$(find /tmp/spinnaker/.hal/default/service-settings/ -name "$i"* | awk -F"/" '{print $NF}' | xargs | sed -e 's/ /,/g')
+        if [[ "$svcn" != "" ]];
+        then
+          IFS=","
+          for svcfile in $svcn
+          do
+            yq -i e '.artifactId = "'$svcimg'"' /tmp/spinnaker/.hal/default/service-settings/$svcfile
+          done
+        else
+          echo "WARNING: Service file $i is not located in default/service-settings/ to override the artifact image from bom"
+        fi
+      done
+    else
+      echo "WARNING: Not specified bom in gitops repo overidden images will be  taken from default/service-settings"
     fi
     rm -rf /tmp/spinnaker/test
     DYNAMIC_ACCOUNTS_REPO=`echo $DYNAMIC_ACCOUNTS_REPO | sed 's/ *$//g'`
@@ -51,8 +81,7 @@ data:
     sed -i  s%DYN_ACCNT_CONFG_PATH%/%g /tmp/spinnaker/.hal/default/profiles/spinnakerconfig.yml
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/profiles/rosco-local.yml
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/service-settings/redis.yml
-    yq e '.deploymentConfigurations.[].security.authz.enabled = "false"' /tmp/spinnaker/.hal/config > /tmp/spinnaker/.hal/config1
-    mv /tmp/spinnaker/.hal/config1 /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.authz.enabled = "false"' /tmp/spinnaker/.hal/config
     if [ -f /tmp/spinnaker/.hal/default/profiles/fiat-local.yml ]; then
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/profiles/fiat-local.yml
     fi
@@ -61,8 +90,7 @@ data:
     if [ -f /tmp/spinnaker/.hal/halyard.yaml ]; then
     cp /tmp/spinnaker/.hal/halyard.yaml /tmp/config
     fi
-    yq e '.deploymentConfigurations.[].security.authn.saml.enabled = "false"' /tmp/spinnaker/.hal/config > /tmp/spinnaker/.hal/config1
-    mv /tmp/spinnaker/.hal/config1 /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.authn.saml.enabled = "false"' /tmp/spinnaker/.hal/config
     rm -rf /tmp/spinnaker/.hal/default/profiles/orca-overrides.yml
     rm -rf /tmp/spinnaker/.hal/default/profiles/fiat-overrides.yml
     rm -rf /tmp/spinnaker/.hal/default/profiles/gate-overrides.yml
