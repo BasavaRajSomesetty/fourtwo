@@ -81,7 +81,18 @@ data:
     sed -i  s%DYN_ACCNT_CONFG_PATH%/%g /tmp/spinnaker/.hal/default/profiles/spinnakerconfig.yml
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/profiles/rosco-local.yml
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/service-settings/redis.yml
-    yq -i e '.deploymentConfigurations.[].security.authz.enabled = "false"' /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.authz.enabled = "true"' /tmp/spinnaker/.hal/config
+    yq -i e '.tasks.useManagedServiceAccounts = "true"' /tmp/spinnaker/.hal/default/profiles/orca-local.yml
+    sed -i s/false/true/ /tmp/spinnaker/.hal/default/profiles/settings-local.js
+    yq -i e '.migrations.migrateToManagedServiceAccounts = "true"' /tmp/spinnaker/.hal/default/profiles/front50-local.yml
+    readfiat=$(yq e '.fiat' /tmp/spinnaker/.hal/default/profiles/fiat-local.yml)
+    if [[ "$readfiat" == "null" ]];
+    then
+      yq -i e '.fiat.admin.roles += ["admin"]' /tmp/spinnaker/.hal/default/profiles/fiat-local.yml
+    else
+      echo "INFO: Admin groups already present in fiat-local.yml file"
+    fi
+    yq -i e '.fiat.admin.roles += ["admin"]' /tmp/spinnaker/.hal/default/profiles/fiat-local.yml
     if [ -f /tmp/spinnaker/.hal/default/profiles/fiat-local.yml ]; then
     sed -i  s/RELEASE_NAME/isd/g /tmp/spinnaker/.hal/default/profiles/fiat-local.yml
     fi
@@ -90,7 +101,23 @@ data:
     if [ -f /tmp/spinnaker/.hal/halyard.yaml ]; then
     cp /tmp/spinnaker/.hal/halyard.yaml /tmp/config
     fi
-    yq -i e '.deploymentConfigurations.[].security.authn.saml.enabled = "false"' /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.authn.saml.enabled = "true"' /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.apiSecurity.overrideBaseUrl = "http://fourtwo-test.isd-dev.opsmx.net/gate"' /tmp/spinnaker/.hal/config
+    yq -i e '.deploymentConfigurations.[].security.uiSecurity.overrideBaseUrl = "http://spindeck-fourtwo-test.isd-dev.opsmx.net"' /tmp/spinnaker/.hal/config
+    if [ -f /tmp/spinnaker/.hal/default/profiles/settings-local.js ]; then
+       cat /tmp/spinnaker/.hal/default/profiles/settings-local.js | grep -o uiUrl
+       if [ $? != 0 ]; then
+         echo "Updating the ISD URL in settings-local.js file"
+         echo 'var uiUrl = "http://fourtwo-test.isd-dev.opsmx.net";' >> /tmp/spinnaker/.hal/default/profiles/settings-local.js
+       fi
+    else
+       touch /tmp/spinnaker/.hal/default/profiles/settings-local.js
+       cat /tmp/spinnaker/.hal/default/profiles/settings-local.js | grep -o uiUrl
+       if [ $? != 0 ]; then
+         echo "Created and Updated the ISD UI Url in settings-local.js file"
+         echo 'var uiUrl = "http://fourtwo-test.isd-dev.opsmx.net";' >> /tmp/spinnaker/.hal/default/profiles/settings-local.js
+       fi
+    fi
     rm -rf /tmp/spinnaker/.hal/default/profiles/orca-overrides.yml
     rm -rf /tmp/spinnaker/.hal/default/profiles/fiat-overrides.yml
     rm -rf /tmp/spinnaker/.hal/default/profiles/gate-overrides.yml

@@ -51,6 +51,12 @@ spec:
         - mountPath: /opt/spinnaker/config/bootstrap.yml
           name: bootstrap-volume
           subPath: bootstrap.yml
+        - mountPath: /opt/spinnaker/saml/oessaml.jks
+          name: saml-jks
+          subPath: oessaml.jks
+        - mountPath: /opt/spinnaker/saml/oesmetadata.xml
+          name: metadata-xml
+          subPath: oesmetadata.xml
         readinessProbe:
           tcpSocket:
             port: 8084
@@ -63,6 +69,12 @@ spec:
           initialDelaySeconds: 60
           periodSeconds: 60
       volumes:
+      - secret:
+          secretName: oessamljks
+        name: saml-jks
+      - secret:
+          secretName: oesmetadataxml
+        name: metadata-xml
       - name: gate-volume
         secret:
           secretName: oes-gate-config

@@ -42,14 +42,14 @@ data:
 
     wait_period=$(($wait_period+10))
     READYBASIC=$([ "$DECK" == "true" ] && [ "$CLOUDCACHING" == "true" ] && [ "$CLOUDRO" == "true" ] && [ "$CLOUDRW" == "true" ] && [ "$CLOUDRODECK" == "true" ] && [ "$FRONT" == "true" ] && [ "$ORCA" == "true" ]  && [ "$ECHOWORKER" == "true" ] && [ "$ECHOSCHEDULER" == "true" ] && [ "$SAPOR" == "true" ] && [ "$PLATFORM" == "true" ] && [ "$AUTOPILOT" == "true" ] && [ "$IGOR" == "true" ]; echo $(($? == 0)) )
-    READY=$READYBASIC
+    READY=$( [ $READYBASIC == 1 ] && [ "$FIAT" == "true" ] ; echo $(($? == 0)) )
 
 
     if [ $READY == 1 ] ;
         then
             echo \"Spinnaker and OES services are Up and Ready..\"
             sleep 5
-            curl -X POST "http://sapor-gate:8084/login?username=admin&password=encrypted:saporpassword:saporpassword&submit=Login"
+            curl -X POST "http://sapor-gate:8084/login?username=tejaswini.munnangi@opsmx.io&password=encrypted:saporpassword:saporpassword&submit=Login"
             curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST  --data '{"datasourceType": "OPA", "name": "OPA", "configurationFields": {"endPoint": "http://opa:8181"}}'   http://oes-platform:8095/platformservice/v2/datasources
             curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST  --data '{"datasourceType": "AUTOPILOT", "name": "Autopilot", "configurationFields": {"username": "admin"} }'   http://oes-platform:8095/platformservice/v2/datasources
             #curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST  --data '{"datasourceType": "ELASTICSEARCH", "name": "elastic-default", "configurationFields": {"endPoint": "https://newoeselastic.opsmx.com", "username": "opsmxuser", "password": "OpsMx@123", "kibanaEndPoint": "https://newoeskibana.opsmx.com", "kibanaPassword": "OpsMx@123", "kibanaUsername": "opsmxuser" }}'   http://oes-platform:8095/platformservice/v2/datasources
@@ -61,7 +61,7 @@ data:
 
             STORAGE_TYPE=git
             BASEURL_HOST=github.com
-            USERNAME=admin
+            USERNAME=tejaswini.munnangi@opsmx.io
             PASSWORD=encrypted:saporpassword:saporpassword
             TOKEN=$(echo -n "$USERNAME":"$PASSWORD" | base64)
             response=$(curl -s http://oes-sapor:8085/oes/accountsConfig/v3/spinnaker)
@@ -73,7 +73,7 @@ data:
               response=$(curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST http://oes-platform:8095/platformservice/v6/datasource --data '{"datasourceType": "GITHUB", "name": "gitops", "spinEnabled": "false", "configurationFields": {"token": "encrypted:gittoken:gittoken", "username": "BasavaRajSomesetty", "hostUrl": "https://github.com/", "url": "https://api.github.com" } }')
               id=$(echo $response | jq '.id')
               curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST http://oes-sapor:8085/oes/accountsConfig/v4/spinnaker --data '{"name":"preview-saas","url":"http://sapor-gate:8084","authenticationType":"LDAP","externalAccountFlag":true,"pipelinePromotionFlag":false,"syncAccountFlag":false,"externalAccountConfiguration":{"accountId": "'"${id}"'","accountName":"gitops","provider":"GITHUB","config":{"bucketName":"","region":"","endPoint":"https://github.com/BasavaRajSomesetty/fourtwo.git","sourcePath":""}},"pipelinePromotionConfiguration":null,"password":"'"${PASSWORD}"'","userName":"'"${USERNAME}"'"}'
-              #curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST http://oes-sapor:8085/oes/accountsConfig/v3/spinnaker --data '{"name": "preview-saas", "url": "http://oes-gate.example.ops.com", "authenticationType": "LDAP", "token": "'"${TOKEN}"'", "externalAccountFlag": "true","pipelinePromotionFlag": "false","syncAccountFlag": "false", "externalAccountConfiguration": {"accountId": "'"${id}"'","accountName": "gitops", "provider": "GITHUB", "config": {"bucketName": "", "region": "","endPoint": "https://github.com/BasavaRajSomesetty/fourtwo.git", "sourcePath": "" }}}'
+              #curl --header "Content-Type: application/json"  --header "x-spinnaker-user: admin" --request POST http://oes-sapor:8085/oes/accountsConfig/v3/spinnaker --data '{"name": "preview-saas", "url": "http://fourtwo-test.isd-dev.opsmx.net/gate", "authenticationType": "LDAP", "token": "'"${TOKEN}"'", "externalAccountFlag": "true","pipelinePromotionFlag": "false","syncAccountFlag": "false", "externalAccountConfiguration": {"accountId": "'"${id}"'","accountName": "gitops", "provider": "GITHUB", "config": {"bucketName": "", "region": "","endPoint": "https://github.com/BasavaRajSomesetty/fourtwo.git", "sourcePath": "" }}}'
                   break
               fi
               if [[ "$STORAGE_TYPE"  ==  "git" && "$BASEURL_HOST" == "gitlab.com" ]];
