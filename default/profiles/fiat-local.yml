@@ -6,11 +6,26 @@ auth.permissions.provider.pipeline: aggregate
 auth.permissions.source.pipeline.prefix:
   enabled: true
   prefixes:
-   - prefix: "*"
+   - prefix: "dev*"
      permissions:
        READ:
        - "ninja"
+       - "devgroup"
+       - "testgroup"
        WRITE:
        - "ninja"
+       - "devgroup"
        EXECUTE:
        - "ninja"
+       - "devgroup"
+  prefixes:
+   - prefix: "test*"
+     permissions:
+       READ:
+       - "ninja"
+       - "testgroup"
+       - "devgroup"
+       WRITE:
+       - "testgroup"
+       EXECUTE:
+       - "testgroup"
