@@ -82,11 +82,12 @@ data:
     $HAL_COMMAND config deploy ha echo enable
 
     # Enable Authentication by default
-    $HAL_COMMAND config security authn ldap edit --url ldap://isd-openldap:389 --user-dn-pattern  'cn={0},dc=example,dc=org'
+    $HAL_COMMAND config security authn ldap edit --url ldap://{{ .Release.Name }}-openldap:389 --user-dn-pattern  cn={0},dc=example,dc=org
+    $HAL_COMMAND config security authn ldap edit --manager-dn cn=admin,dc=example,dc=org --manager-password encrypted:ldappassword:ldappassword
     $HAL_COMMAND config security authn ldap enable
 
     # Enable Authorization
-    $HAL_COMMAND config security authz disable
+    $HAL_COMMAND config security authz enable
 
 
     # Use Deck to route to Gate
