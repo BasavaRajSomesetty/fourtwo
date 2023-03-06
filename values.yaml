@@ -2,9 +2,32 @@
 global:
   ## URL that will be used to access ISD. MUST BE CHANGED
   ## Ensure that this URL is reachable from your browser. Either DNS name server record must exist or "hosts" file must be updated
+  saporgate:
+    config:
+      username: tejaswini.munnangi@opsmx.io      # User name with admin permissions and belonging to admin groups defined in platform service
+      password: encrypted:saporpassword:saporpassword # Any generic String, need not be the real password    
   oesUI:
-    host: fourtwo-test.isd-dev.opsmx.net
+    protocol: http
+    host: fourtwo-test.isd-dev.opsmx.net 
+  spinGate:
+    protocol: http
+    host: spingate-fourtwo-test.isd-dev.opsmx.net    #Update the correct spin-gate url, same as oes-gate for common-gate
+  oesGate:
+    protocol: http
+    host: fourtwo-test.isd-dev.opsmx.net/gate   #Update the correct oes-gate url
+  spinDeck:
+    protocol: http
+    host: spindeck-fourtwo-test.isd-dev.opsmx.net 
+    
+  commonGate:
+    enabled: true
+    spinnakerRBAC: true
+  # Set to true if user need to access Spinnaker seperately
+  spinnakerUrl: true
 
+  auth:
+    saml: true
+    
   ssl:
     enabled: false # Set to true if using "httpS" urls. TLS certificates must be generated for the above URL
 
@@ -22,7 +45,7 @@ global:
   ###############################################################################
   # A trial LDAP is installed by default, with users: admin, user1,2,3 with user1password, user2pa...
   # Set it to false if own LDAP is to be configured
-  installOpenLdap: true
+  installOpenLdap: false
 
   ## ldap configuration used in oes-gate, oes-platform and spinnaker gate for authentication and authorization
   ldap:
@@ -30,14 +53,7 @@ global:
 
   # Set it to true only if gate.config.saml.enabled to true
   auth:
-    saml: false
-
-   ## Valid admin details for ISD authorization
-  saporgate:
-    config:
-      username: admin       #Name of the valid user in your service provider
-      adminGroups: admin    #Name of the valid admin group in your service provider
-      password: encrypted:saporpassword:saporpassword  #password for the saporgate
+    saml: true
 
   minio:
     accessKey: encrypted:miniopassword:miniopassword
@@ -45,6 +61,7 @@ global:
 
 ####################################################
 spinnaker:
+  autoInstallSampleApps: true   # Set this to FALSE if upgrading
   gitopsHalyard: # A repo with appropriate contents used for configuring Spinnaker
     repo:
       type: git # git, s3, stash(bitbucket server) use a different sample values file for s3/bitbuck-stash
@@ -75,7 +92,7 @@ spinnaker:
   spinCli:
     auth:
       basic:
-        username: admin          # Use credentials corresponding to saporgate.config.username
+        username: tejaswini.munnangi@opsmx.io          # Use credentials corresponding to saporgate.config.username
         password: encrypted:saporpassword:saporpassword     # Use credentials corresponding to saporgate.config.password
 
 ####################################################
@@ -97,16 +114,16 @@ gate:
     # kubectl create secret generic oessamljks --from-file=oessaml.jks -n <namespace>
     # kubectl create secret generic samljks-password --from-literal password=changeit -n <namespace>
     saml:
-      enabled: false
+      enabled: true
       userSource: gate  # Groups will be obtained from SAML
       keyStore: /opt/spinnaker/saml/oessaml.jks  # The key in this secret must be oessaml.jks
       keyStorePassword: encrypted:keystorepassword:keystorepassword
       keyStoreAliasName: saml
       metadataUrl: /opt/spinnaker/saml/oesmetadata.xml # The key in this secret must be oesmetadata.xml
-      redirectProtocol: https
-      redirectHostname: oes-gate.ryzon7-gitops.opsmx.org  # OES gate host name
+      redirectProtocol: http
+      redirectHostname: fourtwo-test.isd-dev.opsmx.net/gate  # OES gate host name
       redirectBasePath: /
-      issuerId: ryzonoesgate
+      issuerId: fourtwo
       jksSecretName: oessamljks
       metadataSecretName: oesmetadataxml
 
